@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocAnalyzer AI</title>
+    <!-- <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        .container { border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #result { background: #f9f9f9; padding: 15px; border-left: 5px solid #007bff; margin-top: 20px; white-space: pre-wrap; display: none; }
+        .loading { color: #555; font-style: italic; display: none; }
+    </style> -->
+
+<style>
+    body { 
+        font-family: sans-serif; 
+        max-width: 800px; 
+        margin: 0 auto; /* Changed to 0 auto */
+        padding: 40px 20px; 
+        line-height: 1.6;
+        
+        /* Background properties */
+        background-image: url('/static/background.jpg');
+        background-size: cover;        /* Makes image cover the whole screen */
+        background-position: center;   /* Centers the image */
+        background-attachment: fixed;  /* Keeps image still when scrolling */
+        background-repeat: no-repeat;
+    }
+
+    .container { 
+        background-color: rgba(255, 255, 255, 0.95); /* White with slight transparency */
+        border: 1px solid #ddd; 
+        padding: 30px; 
+        border-radius: 12px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+    }
+
+    #result { 
+        background: #f9f9f9; 
+        padding: 15px; 
+        border-left: 5px solid #007bff; 
+        margin-top: 20px; 
+        white-space: pre-wrap; 
+        display: none; 
+    }
+    
+    .loading { color: #555; font-style: italic; display: none; }
+</style>
+
+</head>
+<body>
+    <div class="container">
+        <h2>Document AI Analyzer</h2>
+        <p>Upload a PDF to analyze it using <strong><span id="model-name-header">...</span></strong>.</p>
+        
+        <input type="file" id="fileInput" accept=".pdf">
+        <button onclick="uploadFile()">Analyze Document</button>
+
+        <p class="loading" id="loader">
+            <span id="model-name-loader">Model</span> is thinking... (this may take a minute)</p>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function loadConfig() {
+            try {
+                const response = await fetch("/config");
+                const configData = await response.json();
+                
+                // Update the placeholders with the model name from Python
+                document.getElementById('model-name-header').innerText = configData.model_name;
+                document.getElementById('model-name-loader').innerText = configData.model_name;
+            } catch (error) {
+                console.error("Could not load model name", error);
+            }
+            }
+
+            // Call this function when the window opens
+            window.onload = loadConfig;
+
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            const loader = document.getElementById('loader');
+
+            if (fileInput.files.length === 0) {
+                alert("Please select a file first!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            // UI Feedback
+            loader.style.display = "block";
+            resultDiv.style.display = "none";
+
+            try {
+                const configResponse = await fetch("/config");
+                const configData = await configResponse.json();
+                const apiKey = configData.api_key;
+
+                const formData = new FormData();
+                formData.append("file", fileInput.files[0]);
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || "Something went wrong");
+
+                document.getElementById('model-name-loader').innerText = configData.model_name;
+                
+                resultDiv.innerText = data.analysis;
+                resultDiv.style.display = "block";
+            } catch (error) {
+                resultDiv.innerText = "Error: " + error.message;
+                resultDiv.style.display = "block";
+            } finally {
+                loader.style.display = "none";
+            }
+        }
+    </script>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            const loader = document.getElementById('loader');
+
+            if (fileInput.files.length === 0) {
+                alert("Please select a file first!");
+                return;
+            }
+
+            // 1. Fetch the key from your backend instead of prompting
+            const configResponse = await fetch("/config");
+            const configData = await configResponse.json();
+            const apiKey = configData.api_key;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            loader.style.display = "block";
+            resultDiv.style.display = "none";
+
+            try {
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    headers: {
+                        "x-api-key": apiKey // This matches your backend Header(None)
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // This catches the 401 "Invalid API Key" error
+                    throw new Error(data.detail || "Something went wrong");
+                }
+                
+                // Show analysis and remaining credits
+                //resultDiv.innerText = `Credits remaining: ${data.credits_remaining}\n\n${data.analysis}`;
+
+                let resultText = "";
+                if (data.credits_remaining !== undefined) {
+                    resultText += `Credits remaining: ${data.credits_remaining}\n\n`;
+                }
+                resultText += data.analysis;
+
+                resultDiv.innerText = resultText;
+                resultDiv.style.display = "block";
+
+            } catch (error) {
+                resultDiv.innerText = "Error: " + error.message;
+                resultDiv.style.display = "block";
+                resultDiv.style.borderLeftColor = "red";
+            } finally {
+                loader.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>

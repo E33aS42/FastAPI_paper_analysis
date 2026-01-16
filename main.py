@@ -7,6 +7,11 @@ from prompts import AGENT_PROMPT
 import os
 import re
 from dotenv import load_dotenv
+from ollama import Client
+
+# Use the environment variable we will set in the next step
+OLLAMA_URL = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+client = Client(host=OLLAMA_URL)
 
 
 load_dotenv() # load value from our environment variable file
@@ -85,7 +90,7 @@ def analyze_document(text):
     Do not include any additional double stars ** other than around the 5 main listed section titles above
     """
 
-    response = ollama.chat(model=MODEL, messages=[
+    response = client.chat(model=MODEL, messages=[
         {'role': 'system', 'content': system_instruction},
         {'role': 'user', 'content': user_prompt},
     ])

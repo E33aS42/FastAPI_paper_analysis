@@ -1,0 +1,2 @@
+curl -i -X POST hon-hannis-e33as42-9c278669.koyeb.app/api/pull \
+     -d '{"name": "tinyllama"}'

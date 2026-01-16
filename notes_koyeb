@@ -1,2 +1,8 @@
 curl -i -X POST hon-hannis-e33as42-9c278669.koyeb.app/api/pull \
      -d '{"name": "tinyllama"}'
+
+curl hon-hannis-e33as42-9c278669.koyeb.app/api/pull -d '{"name": "tinyllama"}'
+
+curl hon-hannis-e33as42-9c278669.koyeb.app/api/pull -d '{"name": "llama3.2:1b"}'
+
+curl -X DELETE http://localhost:11434/api/delete -d '{"name": "tinyllama"}'

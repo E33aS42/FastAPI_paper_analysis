@@ -11,7 +11,7 @@ from ollama import Client
 
 # Use the environment variable we will set in the next step
 OLLAMA_URL = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-client = Client(host=OLLAMA_URL)
+client = Client(host=OLLAMA_URL, timeout=300.0)
 
 
 load_dotenv() # load value from our environment variable file
@@ -22,7 +22,7 @@ print(API_KEY_CREDITS)
 # MODEL = 'mistral'
 # MODEL = 'gemma3:1b'
 MODEL = 'tinyllama'
-# MODEL = 'llama3.2:1b'
+MODEL = 'llama3.2:1b'
 
 app = FastAPI()
 

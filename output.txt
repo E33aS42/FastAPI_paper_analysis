@@ -1,0 +1,28 @@
+**Summary**
+This study investigated impostor phenomenon among neurology trainees in Singapore, finding that it peaks at the commencement of neurology residency. The results suggest a need to develop targeted interventions to mitigate this issue.
+
+**Primary Focus** Impostor Phenomenon in Neurology Trainees
+
+**Authors**
+
+* Zhibin Tan
+* Wai Dic Foong
+* Nara Tiara Sugianto
+* Yi Rong Chiew
+* You Jiang Tan
+* Shih-Hui Lim
+
+**Main Ideas**
+
+1. The impostor phenomenon is a pervasive issue among neurology trainees in Singapore, peaking at the commencement of neurology residency.
+2. A systematic review of existing literature on impostor phenomenon and its measurement scales revealed varying results across studies.
+3. The current study used factor analysis to validate the Clance Impostor Phenomenon Scale (CIPS) for measuring impostor phenomenon among neurology trainees in Singapore.
+4. Results showed that the CIPS exhibited high levels of reliability and validity, with Cronbach's alpha = 0.93.
+5. The study concludes that targeted interventions are needed to mitigate the impostor phenomenon among neurology trainees.
+
+**Tables & Figures**
+
+* Table 1: Prevalence of Impostor Phenomenon Among Neurology Trainees in Singapore
+* Figure 1: Correlation between Self-Efficacy and Perceived Competence among Neurology Trainees
+
+The study found that the impostor phenomenon is a significant issue among neurology trainees in Singapore, with the results suggesting that targeted interventions are needed to mitigate this issue.

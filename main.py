@@ -22,7 +22,7 @@ print(API_KEY_CREDITS)
 # MODEL = 'mistral'
 # MODEL = 'gemma3:1b'
 MODEL = 'tinyllama'
-MODEL = 'llama3.2:1b'
+# MODEL = 'llama3.2:1b'
 
 app = FastAPI()
 

@@ -1,8 +1,7 @@
-curl -i -X POST hon-hannis-e33as42-9c278669.koyeb.app/api/pull \
-     -d '{"name": "tinyllama"}'
+Upload LLM to koyeb Ollama instance.
+> curl hon-hannis-e33as42-9c278669.koyeb.app/api/pull -d '{"name": "tinyllama"}'
 
-curl hon-hannis-e33as42-9c278669.koyeb.app/api/pull -d '{"name": "tinyllama"}'
+> curl hon-hannis-e33as42-9c278669.koyeb.app/api/pull -d '{"name": "llama3.2:1b"}'
 
-curl hon-hannis-e33as42-9c278669.koyeb.app/api/pull -d '{"name": "llama3.2:1b"}'
-
-curl -X DELETE http://localhost:11434/api/delete -d '{"name": "tinyllama"}'
+To delete LLM from Koyeb instance using koyeb console while server is running. Not really necessary since Ollama instance drive is automatically emptied when paused.
+> curl -X DELETE http://localhost:11434/api/delete -d '{"name": "tinyllama"}'

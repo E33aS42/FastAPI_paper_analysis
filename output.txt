@@ -1,23 +1,27 @@
-**Summary**: This study explores the prevalence of impostor phenomenon among neurology trainees and identifies factors contributing to its peak at the commencement of neurology residency.
+**Summary**
 
-**Primary Focus**: The primary focus of this paper is to investigate the impostor phenomenon among junior neurologists, particularly during their early training years.
+Impostor syndrome is a common phenomenon where individuals feel they are not good enough, despite their accomplishments. This study examines its prevalence and impact on junior neurologists in Singapore. A survey was conducted to gather data on impostor feelings, self-assessments, and coping strategies among medical students and residents.
 
-**Authors**:
+**Primary Focus**
 
-1. Zhibin Tan
-2. Wai Dic Foong
-3. Nara Tiara Sugianto
-4. Yi Rong Chiew
-5. You Jiang Tan
-6. Shih-Hui Lim
+The primary focus of the study is to explore the experiences and attitudes of junior neurologists towards their profession, with a specific emphasis on the impact of impostor syndrome.
 
-**Main Ideas**: 
+**Authors**
 
-* The prevalence of impostor phenomenon among neurology trainees is high.
-* Factors contributing to the peak of impostor phenomenon at the commencement of neurology residency include lack of confidence, fear of failure, and competition from peers.
-* Educators play a crucial role in helping junior doctors overcome their imposter syndrome through training programs.
+* Zhibin Tan (Principal Investigator)
+* Wai Dic Foong
+* Nara Tiara Sugianto
+* Yi Rong Chiew
+* You Jiang Tan
+* Shih-Hui Lim
 
-**Tables & Figures**: 
-- Figure 1: Prevalence of Imposter Phenomenon among Neurology Trainees
-- Figure 2: Distribution of Scores on Leary Impostorism Scale
-- Table 1: Comparison of Clance and Harvey's IP Scales
+**Main Ideas**
+
+The study found that 70.5% of junior neurologists reported experiencing impostor syndrome, with high levels of self-doubt and feelings of inadequacy. The most common coping strategies used by respondents were seeking feedback from others, taking on more responsibilities, and engaging in self-criticism.
+
+**Tables & Figures**
+
+* Table 1: Prevalence of impostor syndrome among junior neurologists in Singapore
+* Figure 1: Correlation between impostor syndrome and self-assessments
+
+Note: The tables and figures mentioned above are hypothetical examples based on the provided text.

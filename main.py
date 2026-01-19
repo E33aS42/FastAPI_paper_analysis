@@ -18,10 +18,8 @@ load_dotenv() # load value from our environment variable file
 API_KEY_CREDITS = {os.getenv("API_KEY"): 5} # the value are credits that are subtracted from everytime someone uses the API_KEY (not implemented)
 print(API_KEY_CREDITS)
 MODEL = 'llama3.2'
-# MODEL = 'mistral'
-# MODEL = 'gemma3:1b'
-# MODEL = 'tinyllama'
-# MODEL = 'llama3.2:1b'
+MODEL = 'tinyllama'
+MODEL = 'llama3.2:1b'
 
 app = FastAPI()
 
@@ -88,7 +86,7 @@ def parse_analysis(text):
     return parsing_dict
 
 
-### Comment the next two requests if using tinyllama
+### Comment the next two requests if tinyllama is used
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
@@ -123,7 +121,7 @@ async def analyze_file(file: UploadFile = File(...)):
             }
 
 
-### Uncomment this if tinyllama is used
+### Uncomment blow if tinyllama is used
 
 # @app.get("/", response_class=HTMLResponse)
 # async def get_index():

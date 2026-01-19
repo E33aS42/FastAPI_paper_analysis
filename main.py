@@ -18,8 +18,8 @@ load_dotenv() # load value from our environment variable file
 API_KEY_CREDITS = {os.getenv("API_KEY"): 5} # the value are credits that are subtracted from everytime someone uses the API_KEY (not implemented)
 print(API_KEY_CREDITS)
 MODEL = 'llama3.2'
-MODEL = 'tinyllama'
-MODEL = 'llama3.2:1b'
+# MODEL = 'tinyllama'
+# MODEL = 'llama3.2:1b'
 
 app = FastAPI()
 

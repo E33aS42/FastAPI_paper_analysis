@@ -76,7 +76,7 @@
 <body>
 
     <div class="container">
-        <h2>Paper AI Analyzer</h2>
+        <h2>Document AI Analyzer</h2>
         <p>Upload a PDF to analyze it using <strong><span id="model-name-header">...</span></strong>.</p>
         
         <input type="file" id="fileInput" accept=".pdf">
@@ -91,25 +91,31 @@
         
         <div class="column">
             <div class="info-window">
-                <h3>Paper main Focus</h3>
-                <p id="window-focus">Waiting...</p>
+                <h3>Title</h3>
+                <p id="window-title">Waiting for data...</p>
             </div>
-            <div class="info-window">
-                <h3>Summary</h3>
-                <p id="window-summary">Waiting...</p>
-            </div>
-
             <div class="info-window">
                 <h3>Authors</h3>
                 <p id="window-authors">Waiting for data....</p>
             </div>
+            <div class="info-window">
+                <h3>Paper main Focus</h3>
+                <p id="window-focus">Waiting for data...</p>
+            </div>
         </div>
-
+        <div class="column">
+            <div class="info-window">
+                <h3>Summary</h3>
+                <p id="window-summary">Waiting for data...</p>
+            </div>
+        </div>
         <div class="column">
             <div class="info-window">
                 <h3>Main Ideas</h3>
                 <p id="window-ideas">Waiting for data...</p>
             </div>
+        </div>
+        <div class="column">
             <div class="info-window">
                 <h3>Tables & Figures</h3>
                 <p id="window-tables_figures">Waiting for data...</p>
@@ -173,11 +179,11 @@
                 document.getElementById('model-name-loader').innerText = configData.model_name;
 
                 // Clean the text by splitting before **Summary** as discussed
-                let rawText = data.analysis;
-                let cleanText = rawText;
-                if (rawText.includes("**Summary**")) {
-                    cleanText = "**Summary**" + rawText.split("**Summary**")[1];
-                }
+                // let rawText = data.analysis;
+                // let cleanText = rawText;
+                // if (rawText.includes("**Summary**")) {
+                //     cleanText = "**Summary**" + rawText.split("**Summary**")[1];
+                // }
 
                 // resultDiv.innerText = cleanText;
 
@@ -185,6 +191,9 @@
                 // resultDiv.style.display = "block";
                 // 2. Update the 5 Dashboard Windows
                 // We use the "Optional Chaining" (?.) to prevent errors if a key is missing
+                if (document.getElementById('window-title')) {
+                    document.getElementById('window-title').innerText = data.title || "Not found";
+                }
                 if (document.getElementById('window-focus')) {
                     document.getElementById('window-focus').innerText = data.primary_focus || "N/A";
                 }

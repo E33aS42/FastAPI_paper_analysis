@@ -3,3 +3,6 @@ A small application to analyze a scientific paper using FastAPI and Ollama LLM.
 
 ## 
 
+We employed diferent prompt engineering techniques, including breaking the paper into text chunks to prevent overloading the LLM.
+
+![Example of paper analysis](img/Example_02.png)

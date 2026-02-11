@@ -1,0 +1,5 @@
+{
+	'Title': ['AGENTIC AI: A COMPREHENSIVE FRAMEWORK FOR AUTONOMOUS DECISION-MAKING SYSTEMS IN ARTIFICIAL INTELLIGENCE'],
+	'Authors': ['Panneer Selvam Viswanathan'],
+	'Focus': 'Agentic AI is introduced as a paradigm shift in artificial intelligence systems, characterized by autonomous decision-making capabilities and adaptive problem-solving.'
+}

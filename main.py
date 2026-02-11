@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import ollama
 import fitz  # PyMuPDF
-from prompts import AGENT_PROMPT, INSTRUCTIONS, FIRST_PAGE_PROMPT, CHUNK_PROMPT, SUMMARY_PROMPT
+from prompts import INSTRUCTIONS, FIRST_PAGE_PROMPT, CHUNK_PROMPT, SUMMARY_PROMPT
 import os
 import re
 from dotenv import load_dotenv
@@ -23,7 +23,8 @@ load_dotenv() # load value from our environment variable file
 
 API_KEY_CREDITS = {os.getenv("API_KEY"): 5} # the value are credits that are subtracted from everytime someone uses the API_KEY (not implemented)
 print(API_KEY_CREDITS)
-MODEL = 'llama3.2'
+# MODEL = 'llama3.2'
+MODEL = 'Mistral-nemo'
 
 app = FastAPI()
 
@@ -46,7 +47,6 @@ def verify_api_key(x_api_key: str = Header(None)):
 
 
 def analyze_1st_page(text):
-    #  --> add try except
     system_instructions = (INSTRUCTIONS)
     PROMPT = FIRST_PAGE_PROMPT.replace("{{FIRST_PAGE}}", text)
 
@@ -56,19 +56,18 @@ def analyze_1st_page(text):
         {'role': 'system', 'content': system_instructions},
         {'role': 'user', 'content': PROMPT},
         ],
-        options={"num_ctx": 16384} # 16k tokens context window
+        options={"num_ctx": 2048} # 2k tokens context window
     )
 
     return response['message']['content']
 
 
 def parse_1stpage_analysis(text):
-    #  --> add try except
     with open("title_authors.txt", "w", encoding="utf-8") as file:
         file.write(text)
-    pattern = r'[^a-zA-Z"-:\[\]{}, ]'
+    pattern = r'[^a-zA-Z"-:.\[\]{}, ]'
     cleaned_text = re.sub(pattern, '', text)
-    # print("cleaned_text 1 :", cleaned_text)
+    print("cleaned_text 1 :", cleaned_text)
     if not cleaned_text.endswith('}'):
         cleaned_text += '}'
         # print("cleaned_text 2 :", cleaned_text)
@@ -79,7 +78,6 @@ def parse_1stpage_analysis(text):
 
 
 def analyze_chunk(text):
-    #  --> add try except
     system_instructions = (INSTRUCTIONS)
     PROMPT = CHUNK_PROMPT.replace("{{CHUNK}}", text)
 
@@ -89,7 +87,7 @@ def analyze_chunk(text):
         {'role': 'system', 'content': system_instructions},
         {'role': 'user', 'content': PROMPT},
         ],
-        options={"num_ctx": 16384} # 16k tokens context window
+        options={"num_ctx": 4096} # 4k tokens context window
     )
 
     return response['message']['content']
@@ -105,7 +103,7 @@ def compile_summary(text):
         {'role': 'system', 'content': system_instructions},
         {'role': 'user', 'content': PROMPT},
         ],
-        options={"num_ctx": 16384} # 16k tokens context window
+        options={"num_ctx": 2048} # 2k tokens context window
     )
 
     return response['message']['content']
@@ -168,13 +166,21 @@ async def get_index():
 
 @app.post("/analyze")
 async def analyze_file(file: UploadFile = File(...)):
+    # Check file extension
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Invalid file extension.")
+    
+    # Check MIME Type
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Invalid MIME type.")
+    
     # Extract text from PDF
     content = await file.read()
     doc = fitz.open(stream=content, filetype="pdf")
-    print(f"type: {type(doc)}, nb pages: {len(doc)}")
+    print(f"Type of file: {type(doc)}, number of pages: {len(doc)}")
     nb_pages = len(doc)
 
-    # Analyze first page
+    # Analyze the first page to extract the title, authors, and main focus of the paper.
     page_0 = doc[0].get_text()
     first_page = analyze_1st_page(page_0)
     parse_1stpage = parse_1stpage_analysis(first_page)
@@ -183,9 +189,8 @@ async def analyze_file(file: UploadFile = File(...)):
     authors = re.sub(r'\d+', '', authors) # remove extra numbers
     authors = re.sub(r',\s*,', ', ', authors) # remove extra commas
     authors = authors.strip(' ,') # remove extra commas on the edges
-    print(authors)
 
-    # Analyze chunks of paper then regroup findings
+    # Analyze paper in chunks, then regroup the findings
     group_pages = 3
     analysed_chunks = {"Summary" : [],  "Main Ideas" : [], "Tables" : [], "Figures" : []}
     for i in range(0, nb_pages, group_pages):

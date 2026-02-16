@@ -23,7 +23,8 @@ load_dotenv() # load value from our environment variable file
 
 API_KEY_CREDITS = {os.getenv("API_KEY"): 5} # the value are credits that are subtracted from everytime someone uses the API_KEY (not implemented)
 print(API_KEY_CREDITS)
-# MODEL = 'llama3.2'
+MODEL = 'llama3.2'
+# MODEL = 'llama3.2:1b'
 MODEL = 'Mistral-nemo'
 
 app = FastAPI()
@@ -58,23 +59,18 @@ def analyze_1st_page(text):
         ],
         options={"num_ctx": 2048} # 2k tokens context window
     )
-
     return response['message']['content']
 
 
-def parse_1stpage_analysis(text):
+def parse_1stpage(page):
     with open("title_authors.txt", "w", encoding="utf-8") as file:
-        file.write(text)
-    pattern = r'[^a-zA-Z"-:.\[\]{}, ]'
-    cleaned_text = re.sub(pattern, '', text)
-    print("cleaned_text 1 :", cleaned_text)
-    if not cleaned_text.endswith('}'):
-        cleaned_text += '}'
-        # print("cleaned_text 2 :", cleaned_text)
-    cleaned_text = cleaned_text.replace("'", '"')
-    parsing_dict = ast.literal_eval(cleaned_text)
-    parsing_dict["Title"] = " ".join(parsing_dict["Title"])
-    return parsing_dict
+        file.write(page)
+    print(f"type: {type(page)}\n{page}")
+    page = page.replace("```json", "").replace("```", "").strip()
+    print(f"type: {type(page)}\n{page}")
+    page = json.loads(page)
+    page["Authors"] = ", ".join(page["Authors"])
+    return page
 
 
 def analyze_chunk(text):
@@ -93,6 +89,12 @@ def analyze_chunk(text):
     return response['message']['content']
 
 
+def parse_chunk(chunk):
+    chunk = chunk.replace("```json", "").replace("```", "").strip()
+    chunk = json.loads(chunk)
+    return chunk
+
+
 def compile_summary(text):
     system_instructions = (INSTRUCTIONS)
     PROMPT = SUMMARY_PROMPT.replace("{{SUMMARY_CHUNKS}}", text)
@@ -107,14 +109,6 @@ def compile_summary(text):
     )
 
     return response['message']['content']
-
-
-def parse_chunk(text):
-    parsing_dict = ast.literal_eval(text)
-    if not parsing_dict.endswith('}'):
-        cleaned_text += '}'
-    print(parsing_dict)
-    return parsing_dict
 
 
 def renumber_items(item_list, label):
@@ -140,7 +134,7 @@ def renumber_items(item_list, label):
 def extract_data(analysed_chunks):
     raw_summary = "\n".join(analysed_chunks['Summary'])
     summary = compile_summary(raw_summary)
-    ideas = "\u2022 " + "\n\u2022 ".join(analysed_chunks['Main Ideas'])
+    ideas = "\u2022 " + "\n\u2022 ".join(analysed_chunks['Ideas'])
     nb_tbl = len(analysed_chunks['Tables'])
     nb_fig = len(analysed_chunks['Figures'])
     if nb_tbl > 1:
@@ -148,13 +142,13 @@ def extract_data(analysed_chunks):
     elif nb_tbl == 1:
         tables = f"{nb_tbl} table was found :\n" + "\u2022 " + "\n\u2022 ".join(analysed_chunks['Tables']) + "\n"
     else:
-        tables = "No table were found\n"
+        tables = "No tables were found\n"
     if nb_fig > 1:
         figures = f"{nb_fig} figures were found :\n" + "\u2022 " + "\n\u2022 ".join(analysed_chunks['Figures']) + "\n"
     elif nb_fig == 1:
         figures = f"{nb_fig} figure was found :\n" + "\u2022 " + "\n\u2022 ".join(analysed_chunks['Figures']) + "\n"
     else:
-        figures = "No figure were found\n"
+        figures = "No figures were found\n"
 
     return summary, ideas, tables + "\n" + figures
 
@@ -183,28 +177,25 @@ async def analyze_file(file: UploadFile = File(...)):
     # Analyze the first page to extract the title, authors, and main focus of the paper.
     page_0 = doc[0].get_text()
     first_page = analyze_1st_page(page_0)
-    parse_1stpage = parse_1stpage_analysis(first_page)
-    title, authors, focus = parse_1stpage["Title"], parse_1stpage["Authors"], parse_1stpage["Focus"]
-    authors = ", ".join(authors)
-    authors = re.sub(r'\d+', '', authors) # remove extra numbers
-    authors = re.sub(r',\s*,', ', ', authors) # remove extra commas
-    authors = authors.strip(' ,') # remove extra commas on the edges
+    page1 = parse_1stpage(first_page)
+    title, authors, focus = page1["Title"], page1["Authors"], page1["Focus"]
 
     # Analyze paper in chunks, then regroup the findings
     group_pages = 3
-    analysed_chunks = {"Summary" : [],  "Main Ideas" : [], "Tables" : [], "Figures" : []}
+    analysed_chunks = {"Summary" : [],  "Ideas" : [], "Tables" : [], "Figures" : []}
     for i in range(0, nb_pages, group_pages):
         chunk_text = ""
         for page_num in range(i, min(i + group_pages, nb_pages)):
             chunk_text += doc[page_num].get_text()
         chunk = analyze_chunk(chunk_text)
-        if not chunk.endswith('}'):
-            chunk += '}'
-        print("chunk: \n", chunk)
-        keys_list = list(analysed_chunks.keys())
+        parse_chunk(chunk)
+        print("type: ", type(chunk),"chunk: \n", chunk)
         chunk = ast.literal_eval(chunk)
-        analysed_chunks = {key: analysed_chunks[key] + chunk[key] for key in chunk}
-    # print("analysed_chunks 1: ", analysed_chunks)
+        print("type: ", type(chunk),"chunk: \n", chunk)
+        keys_list = list(chunk.keys())
+        print("keys: ", keys_list)
+        for key, value in chunk.items(): analysed_chunks[key] += value
+    print("analysed_chunks 1: ", analysed_chunks)
     keys_list = list(analysed_chunks.keys())
     if 'Tables' not in keys_list:
         analysed_chunks['Tables'] = []
@@ -227,3 +218,12 @@ async def analyze_file(file: UploadFile = File(...)):
         "ideas": ideas,
         "tables_figures": tables_figures,
     }
+
+    # return {
+    #     "title": title,
+    #     "authors": authors,
+    #     "summary": "",
+    #     "primary_focus": focus,
+    #     "ideas": "",
+    #     "tables_figures": "",
+    # }

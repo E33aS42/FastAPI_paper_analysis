@@ -1,74 +1,112 @@
-FIRST_PAGE_PROMPT = """You are an AI assistant specialized in finding the title, authors nd paper main subject focus on the first page of a scientific paper. Your output must be strictly limited to the data requested.
+INSTRUCTIONS = """
+You are a specialized research analyzer."""
 
-### INSTRUCTIONS:
-1. Find and Read title and authors within the <first_page> tags. Both title and Authors are located before the Abstract. You should stop trying to find title and authors when the Abstract starts. The title should not contained any reference to a journal or proceeding or similar words. The title is about a scientific subject. 
-2. Read the abstract and find the paper main study focus. The abstract starts just after the authors have been listed and before the paper introduction. Do not read the introduction.
-3. OUTPUT FORMAT: You must follow the structure below exactly. 
-4. NO PREAMBLE: Do not include introductory text like "Here is the analysis."
-5. NO POSTAMBLE: Do not include closing remarks, notes, or disclaimers.
+"""- Output ONLY the requested data. No chatter."
+- Do not include any introductory remarks, preambles, or conversational filler.
+- Do not acknowledge the instructions. Provide ONLY the requested structure.
+- Do not include (Bullet Points) or any if not specifically requested.
+"""
 
-<first_page>
+
+FIRST_PAGE_PROMPT = """
+<ROLE>
+You are a precise information extraction agent specializing in academic literature.
+</ROLE>
+
+<TASK>
+Extract the Title, Authors, and Main Focus from the provided text within the <DATA_SOURCE> tags.
+</TASK>
+
+<DATA_SOURCE>
 {{FIRST_PAGE}}
-</first_page>
+</DATA_SOURCE>
 
-6. You will return a python dictionary whose values will be the title and authors found.
+<EXTRACTION RULES>
+1. **Title**: Extract the full scientific title. Exclude journal names, volume numbers, or conference proceedings (e.g., "Published in IEEE" should be ignored).
+2. **Authors**: Extract all author names as a list of strings. 
+   - REMOVE all numerical citations, symbols (e.g., *, †), and affiliations from the name itself. 
+   - Format: "Firstname Lastname".
+3. **Focus**: Read the Abstract only. Provide a 2-3 sentence summary of the core research objective and methodology.
+4. **Boundary**: Stop processing once you reach the "Introduction" or "References" section.
+</EXTRACTION RULES>
 
+<CONSTRAINTS>
+Return ONLY a valid JSON object. No preamble, no markdown blocks, no postamble.
+</CONSTRAINTS>
 
-### REQUIRED OUTPUT STRUCTURE:
+<RESPONSE FORMAT>
 {
-	'Title': [Insert page title here as a list. The title should not contained any reference to a journal or proceeding or similar words. The title can present more than one line and the title should end just before Authors are found.],
-	'Authors': [Insert here the list of authors found of the paper along with their respective job titles, if available. Authors' names should only contain letters. Names should NOT contain any NUMBERS or extra punctuation such as comma.],
-	'Focus': [Insert here a summary of the abstract.]
-} 
-
-"""
-
-
-INSTRUCTIONS = "You are a specialized research analyzer. "
-"Output ONLY the requested data. No chatter."
-"Do not include any introductory remarks, preambles, or conversational filler."
-"Do not acknowledge the instructions. Provide ONLY the requested structure."
-"Do not include (Bullet Points) or any if not specifically requested"
-
-
-CHUNK_PROMPT = """You are an AI assistant specialized in analyzing research papers. Your output must be strictly limited to the data requested. 
-
-### INSTRUCTIONS:
-1. Read and analyze the text within the <chunk> tags.
-2. OUTPUT FORMAT: You will return a Python dictionary. It will NOT be a JSON. You must follow the structure below exactly and fill the values of the dictionary as requested below. 
-3. Do not add any extra flourishes or extra punctuation such as * or "
-4. NO PREAMBLE: Do not include introductory text like "Here is the analysis."
-5. NO POSTAMBLE: Do not include closing remarks, notes, or disclaimers.
-6. Maintain a professional tone in your summary.
-
-<chunk>
-{{CHUNK}}
-</chunk>
-
-### REQUIRED OUTPUT STRUCTURE:
-{
-"Summary" : [ Insert here as a Python list: a text summary as a single element list - max 300 chars ],
-
-"Main Ideas" : [ Insert here as a Python list: List of main ideas discussed in the text with brief description - max 100 chars per idea ],
-
-"Tables" : [ Insert here as a Python list: : List and number using the Table label any tables found in the text, with descriptions - max 100 chars per line.  If a table is mentionned in the study but not found in the current analyzed text, do not mentionned it. ],
-
-"Figures" : [Insert here as a Python list: List any figures found in the text, with descriptions. Each Figure description should be preceded with the 'Figure' label and numbered as such: 'Figure 1 : description' - max 100 chars per line. If a figure is mentionned in the study but not found in the current analyzed text, do not mentionned it.],
-
+  "Title": ["String inside a Python List - The full paper title"],
+  "Authors": ["String", "String"],
+  "Focus": ["String inside a Python List - Summary of the abstract"]
 }
+</RESPONSE FORMAT>
 """
 
-SUMMARY_PROMPT = """You are an AI assistant specialized in creating summaries. Your output must be strictly limited to the data requested. 
 
-### INSTRUCTIONS:
-1. Read and summarize the text within the <chunks> tags.
-2. Only return the summary. Do not add any extra flourishes such as “Summary” or extra punctuation such as * or "
-3. NO PREAMBLE: Do not include introductory text like "Here is the analysis."
-4. NO POSTAMBLE: Do not include closing remarks, notes, or disclaimers.
-5. Maintain a professional tone in your summary.
+CHUNK_PROMPT = """
+<ROLE>
+You are an expert scientific researcher. Analyze the provided text chunk and extract structured insights.
+</ROLE>
 
-<chunks>
+<TASK>
+Summarize, and extract main ideas, tables and figures descriptions from the provided text within the <DATA_SOURCE> tags.
+</TASK>
+
+<DATA_SOURCE>
+{{CHUNK}}
+</DATA_SOURCE>
+
+<EXTRACTION RULES>
+1. **Summary**: Provide a professional summary of the core findings in this specific chunk. Limit: 300 characters.
+2. **Ideas**: Extract a list of distinct key concepts. Each description must be under 100 characters.
+3. **Tables**: 
+   - ONLY include items explicitly detailed or labeled in this chunk. 
+   - If none are present, return an empty list [].
+   - Format: "Table 1: Description".
+4. **Figures**:
+   - ONLY include items explicitly detailed or labeled in this chunk. 
+   - If none are present, return an empty list [].
+   - Format: "Figure 1: Description".
+</EXTRACTION RULES>
+
+<CONSTRAINTS>
+- Return ONLY a valid JSON object with the requested data. 
+- NO PREAMBLE: Do not include introductory text like **Summary:** or "Here is the summary.
+- No markdown blocks and no chatter.
+- NO POSTAMBLE: Do not include closing remarks, notes, or disclaimers.
+- Maintain a professional tone in your summary.
+</CONSTRAINTS>
+
+<RESPONSE FORMAT>
+{
+  "Summary": ["Your 300-char summary here"],
+  "Ideas": ["Idea 1: description", "Idea 2: description"],
+  "Tables": ["Table 1: Description"],
+  "Figures": ["Figure 1: Description"]
+}
+</RESPONSE FORMAT>
+"""
+
+
+SUMMARY_PROMPT = """
+<ROLE>
+You are an AI assistant specialized in creating summaries. Your output must be strictly limited to the data requested.
+</ROLE>
+
+<TASK>
+Read and summarize the text within the <DATA_SOURCE> tags.
+</TASK>
+
+<CONSTRAINTS>
+- Only return the summary. Do not add any extra flourishes such as “Summary” or extra punctuation such as * or "
+- NO PREAMBLE: Do not include introductory text like "Here is the analysis."
+- NO POSTAMBLE: Do not include closing remarks, notes, or disclaimers.
+- Maintain a professional tone in your summary.
+</CONSTRAINTS>
+
+<DATA_SOURCE>
 {{SUMMARY_CHUNKS}}
-</chunks>
+</DATA_SOURCE>
 
 """

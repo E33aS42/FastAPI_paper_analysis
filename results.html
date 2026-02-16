@@ -49,14 +49,15 @@
     .column {
         display: flex;
         flex-direction: column;
-        flex: 1; /* Both columns share equal width */
+        flex: 3; /* Both columns share equal width */
     }
-    
+
     .column-wide {
         display: flex;
         flex-direction: column;
-        flex: 3; 
+        flex: 5; 
     }
+
     .info-window h3 {
         margin-top: 0;
         color: #007bff;
@@ -81,7 +82,7 @@
 <body>
 
     <div class="container">
-        <h2>Scientific Paper AI Analyzer</h2>
+        <h2>Document AI Analyzer</h2>
         <p>Upload a PDF to analyze it using <strong><span id="model-name-header">...</span></strong>.</p>
         
         <input type="file" id="fileInput" accept=".pdf">

@@ -1,5 +1,7 @@
+```json
 {
-	'Title': ['AGENTIC AI: A COMPREHENSIVE FRAMEWORK FOR AUTONOMOUS DECISION-MAKING SYSTEMS IN ARTIFICIAL INTELLIGENCE'],
-	'Authors': ['Panneer Selvam Viswanathan'],
-	'Focus': 'Agentic AI is introduced as a paradigm shift in artificial intelligence systems, characterized by autonomous decision-making capabilities and adaptive problem-solving.'
+  "Title": ["Impostor phenomenon in neurology trainees peaks at commencement of residency"],
+  "Authors": ["Zhibin Tan", "Wai Dic Foong", "Nara Tiara Sugianto", "Yi Rong Chiew", "You Jiang Tan", "Shih-Hui Lim"],
+  "Focus": ["This study investigates the prevalence and impact of Impostor phenomenon among neurology trainees using anonymous surveys conducted over two windows in Singapore. The Leary Impostorism Scale was used to measure impostorism, with a score of 15 indicating moderate or severe symptoms."]
 }
+```

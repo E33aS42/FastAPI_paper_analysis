@@ -57,8 +57,11 @@ def analyze_1st_page(text):
         {'role': 'system', 'content': system_instructions},
         {'role': 'user', 'content': PROMPT},
         ],
-        options={"num_ctx": 2048} # 2k tokens context window
+        options={"num_ctx": 2048, # 2k tokens context window
+        "temperature": 0.0,
+        "top_p": 0.1,}
     )
+
     return response['message']['content']
 
 
@@ -83,7 +86,9 @@ def analyze_chunk(text):
         {'role': 'system', 'content': system_instructions},
         {'role': 'user', 'content': PROMPT},
         ],
-        options={"num_ctx": 4096} # 4k tokens context window
+        options={"num_ctx": 4096, # 4k tokens context window
+        "temperature": 0.0,
+        "top_p": 0.1,}
     )
 
     return response['message']['content']
@@ -105,7 +110,9 @@ def compile_summary(text):
         {'role': 'system', 'content': system_instructions},
         {'role': 'user', 'content': PROMPT},
         ],
-        options={"num_ctx": 2048} # 2k tokens context window
+        options={"num_ctx": 2048, # 2k tokens context window
+        "temperature": 0.0,
+        "top_p": 0.1,}
     )
 
     return response['message']['content']
@@ -181,7 +188,7 @@ async def analyze_file(file: UploadFile = File(...)):
     title, authors, focus = page1["Title"], page1["Authors"], page1["Focus"]
 
     # Analyze paper in chunks, then regroup the findings
-    group_pages = 3
+    group_pages = 2
     analysed_chunks = {"Summary" : [],  "Ideas" : [], "Tables" : [], "Figures" : []}
     for i in range(0, nb_pages, group_pages):
         chunk_text = ""

@@ -41,7 +41,7 @@
         display: flex;
         gap: 50px;
         width: 100%;
-        max-width: 1500px; /* Wider to accommodate two columns */
+        max-width: 2000px; /* Wider to accommodate several columns */
         justify-content: center;
     }
 
@@ -184,19 +184,6 @@
 
                 document.getElementById('model-name-loader').innerText = configData.model_name;
 
-                // Clean the text by splitting before **Summary** as discussed
-                // let rawText = data.analysis;
-                // let cleanText = rawText;
-                // if (rawText.includes("**Summary**")) {
-                //     cleanText = "**Summary**" + rawText.split("**Summary**")[1];
-                // }
-
-                // resultDiv.innerText = cleanText;
-
-
-                // resultDiv.style.display = "block";
-                // 2. Update the 5 Dashboard Windows
-                // We use the "Optional Chaining" (?.) to prevent errors if a key is missing
                 if (document.getElementById('window-title')) {
                     document.getElementById('window-title').innerText = data.title || "Not found";
                 }

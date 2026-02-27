@@ -1,5 +1,5 @@
 INSTRUCTIONS = """
-You are a specialized research analyzer."""
+You are a specialized research paper analyzer."""
 """
 - Output ONLY the requested data. No chatter."
 - Do not include any introductory remarks, preambles, or conversational filler.
@@ -85,48 +85,6 @@ Extract the Main Focus from the provided text within the <DATA_SOURCE> tags.
 
 """
 
-TABFIG_PROMPT1 = """
-<ROLE>
-You are an extraction agent specialized in academic literature.
-</ROLE>
-
-<TASK>
-Extract tables and figures descriptions from the provided chunk of text within the <DATA_SOURCE> tags.
-</TASK>
-
-<DATA_SOURCE>
-{{DATA}}
-</DATA_SOURCE>
-
-<EXTRACTION RULES>
-1. **Tables**: 
-   - List and number using the Table label any tables found in the text, with descriptions - max 100 chars per line.
-   - ONLY include items explicitly detailed or labeled in the chunk. 
-   - If no table is present, return an empty list [].
-   - Format: "Table 1: Description".
-2. **Figures**:
-   - List and number using the Figure label the title of any figures found with descriptions - max 100 chars per line. Do not mention any figure mentionned in the text paragraph.
-   - ONLY include items explicitly detailed or labeled in the text. 
-   - If no figure is present, return an empty list [].
-   - Format: "Figure 1: Description".
-</EXTRACTION RULES>
-
-<CONSTRAINTS>
-- Return ONLY a valid JSON object. No preamble, no markdown blocks, no postamble, no chatter.
-</CONSTRAINTS>
-
-<RESPONSE FORMAT>
-{
-  "Tables": ["Table 1: Description"],
-  "Figures": ["Figure 1: Description"]
-}
-</RESPONSE FORMAT>
-"""
-  #  - List and number using the Table label any tables found in the text, with descriptions - max 100 chars per line. If a table is mentionned in the study but not found in the current analyzed text, do not mentionned it.
-  #  - List and number using the Figure label the title of any figures found with descriptions - max 100 chars per line. Do not mention any figure mentionned in the text paragraph.
-
-
-
 TABFIG_PROMPT = """
 <ROLE>
 You are an expert scientific researcher. Analyze the provided text chunk and extract structured insights.
@@ -155,7 +113,7 @@ Extract tables and figures descriptions from the provided text within the <DATA_
 
 <CONSTRAINTS>
 - Return ONLY a valid JSON object with the requested data. 
-- NO PREAMBLE: Do not include introductory text like **Summary:** or "Here is the summary.
+- NO PREAMBLE.
 - No markdown blocks and no chatter.
 - NO POSTAMBLE: Do not include closing remarks, notes, or disclaimers.
 - Maintain a professional tone in your summary.
@@ -198,7 +156,6 @@ Extract a list of distinct key concepts from the provided text within the <DATA_
 }
 </RESPONSE FORMAT>
 """
-
 
 SUMMARY_PROMPT = """
 <ROLE>

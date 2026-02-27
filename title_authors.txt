@@ -1,5 +1,5 @@
 {
-  "Title": ["ASTERIOS Checker : A Verification Tool for Certifying Airborne Software"],
-  "Authors": ["Amira Methni", "Emmanuel Ohayon", "François Thurieau"],
-  "Focus": ["This paper presents ASTERIOS Checker, a verification tool designed to certify airborne software. The tool uses formal methods and static analysis techniques to ensure the correctness of safety-critical systems in avionics."]
+  "Title": ["Impostor phenomenon in neurology trainees peaks at commencement of residency"],
+  "Authors": ["Zhibin Tan", "Wai Dic Foong", "Nara Tiara Sugianto", "Yi Rong Chiew", "You Jiang Tan", "Shih-Hui Lim"],
+  "Focus": ["The study investigates the prevalence and impact of the Impostor Phenomenon among neurology trainees using anonymous surveys conducted over two windows. The Leary Impostorism Scale was used to measure impostorism levels."]
 }

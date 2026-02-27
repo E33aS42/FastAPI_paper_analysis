@@ -22,7 +22,8 @@ client = Client(host=OLLAMA_URL, timeout=300.0)
 load_dotenv() # load value from our environment variable file
 
 API_KEY_CREDITS = {os.getenv("API_KEY"): 5} # the value are credits that are subtracted from everytime someone uses the API_KEY (not implemented)
-print(API_KEY_CREDITS)  
+print(API_KEY_CREDITS) 
+ERROR = "Generation error"
 MODEL = 'llama3.2'
 # MODEL = 'llama3.2:1b'
 MODEL = 'Mistral-nemo'
@@ -67,95 +68,136 @@ def extract_item(text, prompt_type, temp, tokens):
 
 
 def parse_item(raw, sep, key):
-    raw = raw.replace("```json", "").replace("```", "").strip()
-    raw = json.loads(raw)
-    return sep.join(raw[key])
+    """
+    convert json file into dictionary
+    """
+    try:
+        raw = raw.replace("```json", "").replace("```", "").strip()
+        raw = json.loads(raw)
+        return sep.join(raw[key])
+    except Exception as e:
+        print(e)
+        return ERROR
 
 
 def parse_chunk(chunk):
-    chunk = chunk.replace("```json", "").replace("```", "").strip()
-    chunk = json.loads(chunk)
-    return chunk
+    """
+    convert json file into dictionary
+    """
+    try:
+        chunk = chunk.replace("```json", "").replace("```", "").strip()
+        chunk = json.loads(chunk)
+        return chunk
+    except Exception as e:
+        print(e)
+        return ERROR
 
 
 def remove_duplicate(list_items):
-    set_items = set()
-    new_list_items = []
-    for item in list_items:
-        first = item.split(":")[0]
-        if first not in set_items:
-            set_items.add(first)
-            new_list_items.append(item)
+    """
+    This function aims to remove duplicate figures or tables that were identified more than once by the LLM
+    """
+    try:
+        set_items = set()
+        new_list_items = []
+        for item in list_items:
+            first = item.split(":")[0]
+            if first not in set_items:
+                set_items.add(first)
+                new_list_items.append(item)
 
-    return new_list_items
+        return new_list_items
+    except Exception as e:
+        print(e)
+        return [ERROR]
 
 
 def extract_tabfig(tab_fig_chunks):
     """
     Remove tables and figures duplicates.
-    Returns two strings: a bullet list of tables and a bullet list of figures.
+    Returns a string of two bullet lists of tables and figures.
     """
-    tabs = remove_duplicate(tab_fig_chunks['Tables'])
-    figs = remove_duplicate(tab_fig_chunks['Figures'])
+    try:
+        tabs = remove_duplicate(tab_fig_chunks['Tables'])
+        figs = remove_duplicate(tab_fig_chunks['Figures'])
 
-    nb_tbl = len(tabs)
-    nb_fig = len(figs)
-    if nb_tbl > 1:
-        tables = f"{nb_tbl} tables were found :\n" + "\u2022 " + "\n\u2022 ".join(tabs) + "\n"
-    elif nb_tbl == 1:
-        tables = f"{nb_tbl} table was found :\n" + "\u2022 " + "\n\u2022 ".join(tabs) + "\n"
-    else:
-        tables = "No tables were found\n"
-    if nb_fig > 1:
-        figures = f"{nb_fig} figures were found :\n" + "\u2022 " + "\n\u2022 ".join(figs) + "\n"
-    elif nb_fig == 1:
-        figures = f"{nb_fig} figure was found :\n" + "\u2022 " + "\n\u2022 ".join(figs) + "\n"
-    else:
-        figures = "No figures were found\n"
+        nb_tbl = len(tabs)
+        nb_fig = len(figs)
+        if nb_tbl > 1:
+            tables = f"{nb_tbl} tables were found :\n" + "\u2022 " + "\n\u2022 ".join(tabs) + "\n"
+        elif nb_tbl == 1:
+            tables = f"{nb_tbl} table was found :\n" + "\u2022 " + "\n\u2022 ".join(tabs) + "\n"
+        else:
+            tables = "No tables were found\n"
+        if nb_fig > 1:
+            figures = f"{nb_fig} figures were found :\n" + "\u2022 " + "\n\u2022 ".join(figs) + "\n"
+        elif nb_fig == 1:
+            figures = f"{nb_fig} figure was found :\n" + "\u2022 " + "\n\u2022 ".join(figs) + "\n"
+        else:
+            figures = "No figures were found\n"
 
-    return tables + "\n" + figures
+        return tables + "\n" + figures
+    except Exception as e:
+        print(e)
+        return ERROR
 
 
 def extract_data_1stpage(doc):
     """
     Analyze the first page to extract the title, authors, and main focus of the paper.
     """
-    page_0 = doc[0].get_text()
-    title_raw = extract_item(page_0, TITLE_PROMPT, 0.0, 2048)
-    authors_raw = extract_item(page_0, AUTHORS_PROMPT, 0.0, 2048)
-    focus_raw = extract_item(page_0, FOCUS_PROMPT, 0.0, 2048)
-    title = parse_item(title_raw, " ", 'Title')
-    authors = parse_item(authors_raw, ", ", 'Authors')
-    focus = parse_item(focus_raw, " ", 'Focus')
-    return title, authors, focus
+    try:
+        page_0 = doc[0].get_text()
+        title_raw = extract_item(page_0, TITLE_PROMPT, 0.0, 2048)
+        authors_raw = extract_item(page_0, AUTHORS_PROMPT, 0.0, 2048)
+        focus_raw = extract_item(page_0, FOCUS_PROMPT, 0.0, 2048)
+        title = parse_item(title_raw, " ", 'Title')
+        authors = parse_item(authors_raw, ", ", 'Authors')
+        focus = parse_item(focus_raw, " ", 'Focus')
+        return title, authors, focus
+    except Exception as e:
+        print(e)
+        return ERROR, ERROR, ERROR
 
 
 def renumber_items(item_list, label):
-    new_list = []
-    # Remove any item with 'None'
-    item_list = [item for item in item_list if "None" not in item]
-    item_list = [item for item in item_list if "not" not in item]
-    item_list = [item for item in item_list if "Not" not in item]
-    for i, item in enumerate(item_list, 1):
-        print(f"i={i}, item={item}")
-        # looks for "label X:" 
-        # and replaces it with the current index "label i:"
-        dynamic_pattern = rf"{label} \d+:"
-        new = f"{label} {i}:"
+    try:
+        new_list = []
+        # Remove any item with 'None'
+        item_list = [item for item in item_list if "None" not in item]
+        item_list = [item for item in item_list if "not" not in item]
+        item_list = [item for item in item_list if "Not" not in item]
+        for i, item in enumerate(item_list, 1):
+            print(f"i={i}, item={item}")
+            # looks for "label X:" 
+            # and replaces it with the current index "label i:"
+            dynamic_pattern = rf"{label} \d+:"
+            new = f"{label} {i}:"
 
-        # If the pattern exists in item, replace existing label with new label; otherwise, just keep the item
-        new_item = re.sub(dynamic_pattern, new, item)
-        new_list.append(new_item)
-    return new_list
+            # If the pattern exists in item, replace existing label with new label; otherwise, just keep the item
+            new_item = re.sub(dynamic_pattern, new, item)
+            new_list.append(new_item)
+        return new_list
+    except Exception as e:
+        print(e)
+        return [ERROR]
 
 
 def extract_data(sum_id_chunks):
-    raw_summary = "\n".join(sum_id_chunks['Summary'])
-    summary = extract_item(raw_summary, SUMMARY_PROMPT, 0.2, 2048)
-    ideas_raw = sum_id_chunks['Ideas']
-    ideas_list = renumber_items(ideas_raw , "idea")
-    ideas = "\u2022 " + "\n\u2022 ".join(ideas_list)
-    return summary, ideas
+    """
+    Create a summary of the paper.
+    Return a bullet list of main ideas presented in the paper
+    """
+    try:
+        raw_summary = "\n".join(sum_id_chunks['Summary'])
+        summary = extract_item(raw_summary, SUMMARY_PROMPT, 0.2, 2048)
+        ideas_raw = sum_id_chunks['Ideas']
+        ideas_list = renumber_items(ideas_raw , "idea")
+        ideas = "\u2022 " + "\n\u2022 ".join(ideas_list)
+        return summary, ideas
+    except Exception as e:
+        print(e)
+        return ERROR, ERROR
 
 
 def analyze_chunks(doc):
@@ -166,29 +208,31 @@ def analyze_chunks(doc):
     - Main ideas mentionned in the paper
     - Paper summary
     """
-    group_pages = 2
-    nb_pages = len(doc)
-    tab_fig_chunks = {"Tables" : [], "Figures" : []}
-    sum_id_chunks = {"Summary" : [],  "Ideas" : []}
-    for i in range(0, nb_pages, group_pages):
-        chunk_text = ""
-        for page_num in range(i, min(i + group_pages, nb_pages)):
-            chunk_text += doc[page_num].get_text()
-        with open("text.txt", "a", encoding="utf-8") as file:
-            file.write(chunk_text)
-        tabfig = parse_chunk(extract_item(chunk_text, TABFIG_PROMPT, 0.1, 4096))
-        chunk = parse_chunk(extract_item(chunk_text, CHUNK_PROMPT, 0.1, 4096))
+    try:
+        group_pages = 2
+        nb_pages = len(doc)
+        tab_fig_chunks = {"Tables" : [], "Figures" : []}
+        sum_id_chunks = {"Summary" : [],  "Ideas" : []}
+        for i in range(0, nb_pages, group_pages):
+            chunk_text = ""
+            for page_num in range(i, min(i + group_pages, nb_pages)):
+                chunk_text += doc[page_num].get_text()
+            with open("text.txt", "a", encoding="utf-8") as file:
+                file.write(chunk_text)
+            tabfig = parse_chunk(extract_item(chunk_text, TABFIG_PROMPT, 0.1, 4096))
+            chunk = parse_chunk(extract_item(chunk_text, CHUNK_PROMPT, 0.1, 4096))
 
-        # combine all elements found into dictionary
-        keys_list = list(tabfig.keys())
-        for key, value in tabfig.items(): tab_fig_chunks[key] += value
-        keys_list = list(chunk.keys())
-        for key, value in chunk.items(): sum_id_chunks[key] += value
+            # combine all elements found into dictionaries
+            for key, value in tabfig.items(): tab_fig_chunks[key] += value
+            for key, value in chunk.items(): sum_id_chunks[key] += value
 
-    tables_figures = extract_tabfig(tab_fig_chunks)
-    summary, ideas = extract_data(sum_id_chunks)
+        tables_figures = extract_tabfig(tab_fig_chunks)
+        summary, ideas = extract_data(sum_id_chunks)
 
-    return summary, ideas, tables_figures
+        return summary, ideas, tables_figures
+    except Exception as e:
+        print(e)
+        return ERROR, ERROR, ERROR
 
 
 @app.get("/", response_class=HTMLResponse)
